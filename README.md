@@ -4,9 +4,11 @@ This is a project using FFmpeg to convert files from one format to another. The 
 
 ## Prerequisites
 
-- JDK 11 or later
+- Java 17
+- Gradle
 - Docker
 - Docker Compose
+- Minio
 - FFmpeg installed and accessible in system's `PATH`
 
 ## Setup
@@ -41,6 +43,29 @@ curl -X POST "http://localhost:8080/convert" \
          }'
 ```
 Replace the placeholders with the appropriate Minio bucket names, object keys, and file formats.
+
+## Using a RAM Disk for Temporary File Storage
+
+By default, the application stores temporary files on disk during the file conversion process. To minimize the overhead of reading and writing files to disk, you can use a RAM disk as the temporary file storage.
+
+### Creating a RAM Disk on Linux
+
+To create a RAM disk on Linux, run the following commands:
+
+```bash
+sudo mkdir /mnt/ramdisk
+sudo mount -t tmpfs -o size=1G tmpfs /mnt/ramdisk
+```
+This creates a RAM disk with a size of 1 GB mounted at `/mnt/ramdisk`. You can adjust the size according to your requirements.
+
+## Configuring the Application to Use the RAM Disk
+Update the tempDir property in your application.yml file to point to the RAM disk:
+
+```
+tempDir: /mnt/ramdisk
+```
+
+Keep in mind that using a RAM disk will consume memory, so ensure your system has enough free RAM to accommodate the disk size and other running processes.
 
 ## Testing
 Run the tests for the project with the following command:
