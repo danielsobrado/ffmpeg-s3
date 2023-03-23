@@ -67,6 +67,54 @@ tempDir: /mnt/ramdisk
 
 Keep in mind that using a RAM disk will consume memory, so ensure your system has enough free RAM to accommodate the disk size and other running processes.
 
+## Signed URLs with MinIO and FFmpeg Integration
+
+Signed URLs are a secure and convenient way to provide temporary access to objects in a MinIO bucket. Using signed URLs, you can grant limited-time access to download or upload objects without sharing your MinIO credentials.
+
+### How Signed URLs Work in MinIO
+
+MinIO allows you to generate signed URLs using the `getPresignedObjectUrl` method. You can specify the HTTP method (GET, PUT, DELETE), the bucket, the object key, and the expiration time for the URL.
+
+When a user accesses the signed URL, MinIO checks if the URL is still valid (not expired) and if the requested operation (GET, PUT, DELETE) is allowed. If the conditions are met, MinIO performs the operation without requiring any additional authentication.
+
+### Integrating Signed URLs with FFmpeg
+
+Integrating signed URLs with FFmpeg allows you to directly download and upload files to and from MinIO buckets for processing. This eliminates the need to store intermediate files on your server, reducing storage requirements and improving performance.
+
+To integrate signed URLs with FFmpeg:
+
+1. **Generate a signed URL for downloading the input file:** Create a signed URL using the `getPresignedObjectUrl` method with the GET method, input bucket, and input object key.
+
+```java
+String inputUrl = minioClient.getPresignedObjectUrl(
+        GetPresignedObjectUrlArgs.builder()
+        .method(Method.GET)
+        .bucket(inputBucket)
+        .object(inputFileKey)
+        .expiry(1, TimeUnit.HOURS)
+        .build()
+        );
+```
+
+2. **Generate a signed URL for uploading the output file:** Create a signed URL using the `getPresignedObjectUrl` method with the PUT method, output bucket, and output object key.
+
+```java
+String outputUrl = minioClient.getPresignedObjectUrl( 
+        GetPresignedObjectUrlArgs.builder() 
+        .method(Method.PUT) 
+        .bucket(outputBucket) 
+        .object(outputFileKey)
+        .expiry(1, TimeUnit.HOURS)
+        .build() 
+        );
+```
+
+3. **Use FFmpeg with the signed URLs:** Execute FFmpeg commands using the signed URLs as input and output, allowing FFmpeg to download the input file directly from the MinIO bucket and upload the output file without the need for intermediate storage.
+
+`ffmpeg -i "inputUrl" -c:v libx264 -preset medium -crf 23 "outputUrl"`
+
+By using signed URLs with FFmpeg, you can securely and efficiently process video files directly in your MinIO storage environment.
+
 ## Testing
 Run the tests for the project with the following command:
 
