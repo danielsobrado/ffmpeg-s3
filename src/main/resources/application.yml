@@ -1,0 +1,12 @@
+minio:
+  endpoint: http://minio:9000
+  accessKey: minioaccesskey
+  secretKey: miniosecretkey
+
+ffmpeg:
+  executablePath: /path/to/ffmpeg
+
+tempDir: /path/to/temporary/directory
+
+server:
+  port: 8080
