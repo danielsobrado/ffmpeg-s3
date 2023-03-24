@@ -52,7 +52,6 @@ public class MinioFileServiceTest {
         GetObjectResponse getObjectResponse = mock(GetObjectResponse.class);
         InputStream inputStream = mock(InputStream.class);
 
-        when(getObjectResponse.readAllBytes()).thenReturn("Test content".getBytes());
         when(minioClient.getObject(any())).thenReturn(getObjectResponse);
 
         InputStream result = minioFileService.downloadFile(bucketName, objectName);

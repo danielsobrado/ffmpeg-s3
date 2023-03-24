@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 @Tag("integration")
 @Testcontainers
@@ -54,23 +54,20 @@ public class MinioIntegrationTest {
         String bucketName = "test-bucket";
         String objectName = "test/object";
         byte[] testContent = "Test content".getBytes();
-        InputStream inputStream = new ByteArrayInputStream(testContent);
-        String contentType = "text/plain";
 
-        // Create a bucket
-        minioFileService.createBucket(bucketName);
+        try (InputStream inputStream = new ByteArrayInputStream(testContent)) {
+            String contentType = "text/plain";
 
-        // Upload a file
-        minioFileService.uploadFile(bucketName, objectName, inputStream, contentType);
+            minioFileService.createBucket(bucketName);
+
+            minioFileService.uploadFile(bucketName, objectName, inputStream, contentType);
+        }
 
         // Download the file
-        InputStream resultStream = minioFileService.downloadFile(bucketName, objectName);
-        byte[] resultContent = resultStream.readAllBytes();
+        try (InputStream resultStream = minioFileService.downloadFile(bucketName, objectName)) {
+            byte[] resultContent = resultStream.readAllBytes();
 
-        // Assert content is the same
-        assertEquals(testContent.length, resultContent.length);
-        for (int i = 0; i < testContent.length; i++) {
-            assertEquals(testContent[i], resultContent[i]);
+            assertArrayEquals(testContent, resultContent);
         }
     }
 }
