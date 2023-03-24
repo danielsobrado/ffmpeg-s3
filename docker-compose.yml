@@ -25,5 +25,17 @@ services:
     volumes:
       - minio_data:/data
 
+  minio_console:
+    image: minio/console:v0.13.0
+    container_name: minio_console
+    depends_on:
+      - minio
+    environment:
+      CONSOLE_PBKDF_ROUNDS: "100000"
+      CONSOLE_MINIO_SERVER: http://minio:9000
+      CONSOLE_MINIO_SERVER_TLS_SKIP_VERIFICATION: "on"
+    ports:
+      - "9090:9090"
+
 volumes:
   minio_data:
