@@ -1,5 +1,5 @@
 # Start with a base image containing Java runtime
-FROM adoptopenjdk/openjdk17:alpine-jre
+FROM eclipse-temurin:17-jre-alpine
 
 # The application's jar file
 ARG JAR_FILE=build/libs/*.jar
